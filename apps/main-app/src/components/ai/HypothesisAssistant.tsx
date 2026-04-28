@@ -1,6 +1,6 @@
 import { Bot, Send, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import type { AiAnswer } from '../../data/aiEngine';
+import type { AiAnswer, AiErrorPayload } from '../../data/aiEngine';
 
 const apiBaseUrl =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ||
@@ -30,7 +30,7 @@ export function HypothesisAssistant() {
         body: JSON.stringify({ question: cleanQuestion })
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as AiAnswer | AiErrorPayload;
 
       if (!response.ok) {
         if (isGithubPages && response.status === 404) {
@@ -38,7 +38,11 @@ export function HypothesisAssistant() {
             'На GitHub Pages доступна только статическая версия интерфейса. Серверный endpoint для Gemini API там не работает.'
           );
         }
-        throw new Error(data?.error ? String(data.error) : `API вернул статус ${response.status}`);
+        const errorMessage =
+          'error' in data && data.error
+            ? `${data.error}${data.retryable ? ' Можно повторить запрос немного позже.' : ''}`
+            : `API вернул статус ${response.status}`;
+        throw new Error(errorMessage);
       }
 
       setAnswer(data as AiAnswer);
@@ -55,8 +59,8 @@ export function HypothesisAssistant() {
         <div className="section-title">
           <Bot size={22} />
           <div>
-            <h2>Запрос на проверку</h2>
-            <p>Введите вопрос или гипотезу. Ответ формируется серверным ИИ-движком по данным экспериментального стенда.</p>
+            <h2>Рабочий экран проверки</h2>
+            <p>Введите вопрос или гипотезу. Ответ формируется по структуре стенда и экспериментальным метрикам.</p>
           </div>
         </div>
 

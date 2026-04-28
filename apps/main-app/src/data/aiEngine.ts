@@ -10,3 +10,9 @@ export interface AiAnswer {
   recommendation: string;
   provider?: 'gemini';
 }
+
+export interface AiErrorPayload {
+  error: string;
+  code?: string;
+  retryable?: boolean;
+}

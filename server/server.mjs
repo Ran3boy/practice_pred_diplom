@@ -105,9 +105,8 @@ async function handleHypothesisCheck(request, response) {
   const data = await geminiResponse.json();
 
   if (!geminiResponse.ok) {
-    sendJson(response, geminiResponse.status, {
-      error: data?.error?.message ?? 'Gemini API request failed'
-    });
+    const apiError = normalizeGeminiApiError(geminiResponse.status, data?.error?.message);
+    sendJson(response, apiError.status, apiError.payload);
     return;
   }
 
@@ -209,6 +208,64 @@ function buildConnectionErrorMessage(error) {
   const code = error?.cause?.code;
   const detail = code ? ` Техническая причина: ${code}.` : '';
   return `Не удалось подключиться к Gemini API после нескольких попыток. Проверьте интернет, VPN/регион, DNS Docker Desktop и доступ к generativelanguage.googleapis.com.${detail}`;
+}
+
+function normalizeGeminiApiError(status, message) {
+  const text = String(message ?? 'Gemini API request failed');
+  const normalized = text.toLowerCase();
+
+  if (normalized.includes('experiencing high demand')) {
+    return {
+      status: 503,
+      payload: {
+        error: 'Gemini сейчас перегружен. Повторите запрос через 30-60 секунд.',
+        code: 'gemini_high_demand',
+        retryable: true
+      }
+    };
+  }
+
+  if (normalized.includes('quota exceeded') || normalized.includes('billing details')) {
+    return {
+      status: 429,
+      payload: {
+        error: 'Для текущего Gemini API key исчерпана квота или не активирован billing. Попробуйте позже, смените модель или проверьте лимиты ключа.',
+        code: 'gemini_quota_exceeded',
+        retryable: true
+      }
+    };
+  }
+
+  if (normalized.includes('user location is not supported')) {
+    return {
+      status: 403,
+      payload: {
+        error: 'Gemini API недоступен для текущего региона или IP. Нужен другой интернет, VPN или поддерживаемый аккаунт/регион.',
+        code: 'gemini_region_unsupported',
+        retryable: false
+      }
+    };
+  }
+
+  if (normalized.includes('model') && normalized.includes('not found')) {
+    return {
+      status: 400,
+      payload: {
+        error: `Указанная модель Gemini недоступна: ${model}. Проверьте GEMINI_MODEL в .env.`,
+        code: 'gemini_model_not_found',
+        retryable: false
+      }
+    };
+  }
+
+  return {
+    status,
+    payload: {
+      error: text,
+      code: 'gemini_api_error',
+      retryable: status >= 500
+    }
+  };
 }
 
 function delay(ms) {
