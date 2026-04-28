@@ -14,6 +14,9 @@ jobs:
   build-test-and-image:
     runs-on: ubuntu-latest
 
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,9 +51,9 @@ jobs:
           docker rm -f frontend-comparison-lab-test
 
       - name: Smoke test Gemini secret presence
-        if: ${{ secrets.GEMINI_API_KEY != '' }}
+        if: ${{ env.GEMINI_API_KEY != '' }}
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ env.GEMINI_API_KEY }}
           GEMINI_MODEL: gemini-2.5-flash-lite
         run: |
           docker run -d --name frontend-comparison-lab-secret-test \
@@ -77,4 +80,3 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
-
