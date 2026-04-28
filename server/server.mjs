@@ -38,6 +38,13 @@ const mimeTypes = {
 createServer(async (request, response) => {
   try {
     const url = new URL(request.url ?? '/', `http://${request.headers.host}`);
+    applyCorsHeaders(request, response);
+
+    if (request.method === 'OPTIONS') {
+      response.writeHead(204);
+      response.end();
+      return;
+    }
 
     if (url.pathname === '/health') {
       sendJson(response, 200, {
@@ -386,4 +393,12 @@ function readBody(request) {
 function sendJson(response, statusCode, payload) {
   response.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
   response.end(JSON.stringify(payload));
+}
+
+function applyCorsHeaders(request, response) {
+  const origin = request.headers.origin;
+  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  response.setHeader('Access-Control-Allow-Origin', origin ?? '*');
+  response.setHeader('Vary', 'Origin');
 }

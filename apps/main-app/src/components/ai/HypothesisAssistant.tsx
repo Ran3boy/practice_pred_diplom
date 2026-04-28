@@ -2,6 +2,10 @@ import { Bot, Send, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import type { AiAnswer } from '../../data/aiEngine';
 
+const apiBaseUrl =
+  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ||
+  (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io') ? 'http://127.0.0.1:8080' : '');
+
 export function HypothesisAssistant() {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState<AiAnswer | null>(null);
@@ -20,7 +24,7 @@ export function HypothesisAssistant() {
     setAnswer(null);
 
     try {
-      const response = await fetch('/api/check-hypothesis', {
+      const response = await fetch(`${apiBaseUrl}/api/check-hypothesis`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: cleanQuestion })
@@ -58,7 +62,7 @@ export function HypothesisAssistant() {
 
         {isGithubPages ? (
           <div className="pages-hint">
-            GitHub Pages показывает статическое превью. Для живой проверки через Gemini нужен запуск сервера или Docker-контейнера.
+            GitHub Pages показывает фронтенд, а запросы отправляются в локальный Docker на `127.0.0.1:8080`. Контейнер должен быть запущен на этой же машине.
           </div>
         ) : null}
 
