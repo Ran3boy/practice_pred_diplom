@@ -75,8 +75,7 @@ jobs:
 
       - name: Publish Docker image to GHCR
         if: github.event_name == 'push'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+        run: |
+          IMAGE_NAME=$(echo "ghcr.io/${{ github.repository }}:latest" | tr '[:upper:]' '[:lower:]')
+          docker build -t "$IMAGE_NAME" .
+          docker push "$IMAGE_NAME"
