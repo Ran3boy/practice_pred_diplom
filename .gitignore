@@ -4,6 +4,7 @@ coverage/
 .vite/
 .angular/
 out/
+.playwright-mcp/
 npm-debug.log*
 dev-server*.log
 *.tsbuildinfo
