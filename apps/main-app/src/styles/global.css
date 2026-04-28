@@ -396,6 +396,16 @@ pre {
   line-height: 1.5;
 }
 
+.pages-hint {
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  line-height: 1.5;
+}
+
 .empty-answer {
   display: grid;
   min-height: 316px;

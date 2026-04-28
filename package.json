@@ -19,6 +19,7 @@
     "build:angular": "npm --prefix apps/angular-demo run build",
     "experiment": "node scripts/collect-experiment-data.mjs",
     "experiment:full": "npm run build && npm run build:angular && npm run experiment",
+    "build:pages": "npm run build && npm run experiment && node scripts/prepare-pages.mjs",
     "serve:api": "set PUBLIC_DIR=apps/main-app/dist&& set PORT=8787&& node server/server.mjs"
   },
   "engines": {

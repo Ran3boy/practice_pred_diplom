@@ -3,6 +3,7 @@ dist/
 coverage/
 .vite/
 .angular/
+out/
 npm-debug.log*
 dev-server*.log
 *.tsbuildinfo

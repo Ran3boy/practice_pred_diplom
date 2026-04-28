@@ -7,6 +7,7 @@ export function HypothesisAssistant() {
   const [answer, setAnswer] = useState<AiAnswer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const isGithubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
 
   async function submitQuestion() {
     const cleanQuestion = question.trim();
@@ -28,6 +29,11 @@ export function HypothesisAssistant() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (isGithubPages && response.status === 404) {
+          throw new Error(
+            'На GitHub Pages доступна только статическая версия интерфейса. Серверный endpoint для Gemini API там не работает.'
+          );
+        }
         throw new Error(data?.error ? String(data.error) : `API вернул статус ${response.status}`);
       }
 
@@ -49,6 +55,12 @@ export function HypothesisAssistant() {
             <p>Введите вопрос или гипотезу. Ответ формируется серверным ИИ-движком по данным экспериментального стенда.</p>
           </div>
         </div>
+
+        {isGithubPages ? (
+          <div className="pages-hint">
+            GitHub Pages показывает статическое превью. Для живой проверки через Gemini нужен запуск сервера или Docker-контейнера.
+          </div>
+        ) : null}
 
         <form
           className="assistant-form"
