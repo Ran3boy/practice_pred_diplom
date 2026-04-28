@@ -1,0 +1,6 @@
+﻿id,title,relatedCriteria,relatedMetrics,componentIds,technologyIds
+H1,Гипотеза об инкапсуляции,K2|K3|K5,инкапсуляция DOM|изоляция стилей|повторное использование,product-card|tabs|form,web-components|react|vue|angular
+H2,Гипотеза о переносимости,K5|K6|K10,количество зависимостей|удобство повторного использования|применимость,counter|product-card|tabs,web-components|react|vue|angular|vanilla
+H3,Гипотеза о скорости разработки интерактивного UI,K4|K7|K10,читаемость кода|сложность реализации|удобство поддержки,counter|todo|tabs|form,react|vue|web-components|angular|vanilla
+H4,Гипотеза о корпоративной масштабируемости,K7|K8|K4|K10,масштабируемость|tooling|удобство поддержки|применимость,todo|form|tabs,angular|react|vue|web-components
+H5,Гипотеза о цене минимализма,K1|K4|K6|K8|K9,количество зависимостей|размер сборки|сложность реализации|удобство поддержки,counter|todo|form,vanilla|web-components|react|vue|angular

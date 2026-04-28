@@ -1,0 +1,10 @@
+services:
+  frontend-comparison-lab:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash-lite}
+    ports:
+      - "8080:80"
+    restart: unless-stopped

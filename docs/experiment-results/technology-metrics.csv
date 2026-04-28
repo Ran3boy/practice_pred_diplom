@@ -1,0 +1,6 @@
+﻿id,name,sourceDir,files,loc,dependencies,buildKb
+web-components,Web Components,apps/main-app/src/implementations/web-components,1,179,0,182
+react,React,apps/main-app/src/implementations/react,2,38,7,182
+vue,Vue,apps/main-app/src/implementations/vue,2,35,0,
+angular,Angular,apps/angular-demo/src/app,5,151,11,194
+vanilla,Vanilla JavaScript,apps/main-app/src/implementations/vanilla,1,20,0,

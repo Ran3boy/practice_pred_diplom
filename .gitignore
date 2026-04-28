@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.vite/
+.angular/
+npm-debug.log*
+dev-server*.log
+*.tsbuildinfo
+Dockerfile.local
+.env
+.env.local

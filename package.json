@@ -1,0 +1,27 @@
+{
+  "name": "frontend-comparison-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Интерактивный веб-ресурс с песочницей для экспериментальной проверки гипотез о frontend-технологиях.",
+  "workspaces": [
+    "apps/main-app",
+    "apps/angular-demo",
+    "packages/*"
+  ],
+  "scripts": {
+    "install:apps": "npm install --prefix apps/main-app && npm install --prefix apps/angular-demo",
+    "dev": "npm --prefix apps/main-app run dev",
+    "build": "npm --prefix apps/main-app run build",
+    "preview": "npm --prefix apps/main-app run preview",
+    "lint": "npm --prefix apps/main-app run lint",
+    "test": "npm --prefix apps/main-app run test",
+    "check": "npm run build && npm run test",
+    "build:angular": "npm --prefix apps/angular-demo run build",
+    "experiment": "node scripts/collect-experiment-data.mjs",
+    "experiment:full": "npm run build && npm run build:angular && npm run experiment",
+    "serve:api": "set PUBLIC_DIR=apps/main-app/dist&& set PORT=8787&& node server/server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

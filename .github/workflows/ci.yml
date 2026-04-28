@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-test-and-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm run install:apps
+
+      - name: Build and test
+        run: npm run check
+
+      - name: Build Angular demo
+        run: npm run build:angular
+
+      - name: Collect experiment data
+        run: npm run experiment
+
+      - name: Build Docker image
+        run: docker build -t frontend-comparison-lab .
+
+      - name: Smoke test container without secret
+        run: |
+          docker run -d --name frontend-comparison-lab-test -p 8080:80 frontend-comparison-lab
+          sleep 3
+          curl --fail http://localhost:8080/health
+          curl --fail http://localhost:8080/experiment-results/summary.json
+          docker rm -f frontend-comparison-lab-test
+
+      - name: Smoke test Gemini secret presence
+        if: ${{ secrets.GEMINI_API_KEY != '' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-2.5-flash-lite
+        run: |
+          docker run -d --name frontend-comparison-lab-secret-test \
+            -p 8081:80 \
+            -e GEMINI_API_KEY="$GEMINI_API_KEY" \
+            -e GEMINI_MODEL="$GEMINI_MODEL" \
+            frontend-comparison-lab
+          sleep 3
+          curl --fail http://localhost:8081/health | grep '"geminiConfigured":true'
+          docker rm -f frontend-comparison-lab-secret-test
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Docker image to GHCR
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
