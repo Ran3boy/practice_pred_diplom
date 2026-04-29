@@ -2,16 +2,13 @@ import { Bot, Send, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import type { AiAnswer, AiErrorPayload } from '../../data/aiEngine';
 
-const apiBaseUrl =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ||
-  (typeof window !== 'undefined' && window.location.hostname.endsWith('github.io') ? 'http://127.0.0.1:8080' : '');
+const apiBaseUrl = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '').replace(/\/$/, '');
 
 export function HypothesisAssistant() {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState<AiAnswer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const isGithubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
 
   async function submitQuestion() {
     const cleanQuestion = question.trim();
@@ -33,11 +30,6 @@ export function HypothesisAssistant() {
       const data = (await response.json()) as AiAnswer | AiErrorPayload;
 
       if (!response.ok) {
-        if (isGithubPages && response.status === 404) {
-          throw new Error(
-            'На GitHub Pages доступна только статическая версия интерфейса. Серверный endpoint для Gemini API там не работает.'
-          );
-        }
         const errorMessage =
           'error' in data && data.error
             ? `${data.error}${data.retryable ? ' Можно повторить запрос немного позже.' : ''}`
@@ -63,12 +55,6 @@ export function HypothesisAssistant() {
             <p>Введите вопрос или гипотезу. Ответ формируется по структуре стенда и экспериментальным метрикам.</p>
           </div>
         </div>
-
-        {isGithubPages ? (
-          <div className="pages-hint">
-            GitHub Pages показывает фронтенд, а запросы отправляются в локальный Docker на `127.0.0.1:8080`. Контейнер должен быть запущен на этой же машине.
-          </div>
-        ) : null}
 
         <form
           className="assistant-form"
