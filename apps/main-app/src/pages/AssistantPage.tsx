@@ -5,8 +5,8 @@ export function AssistantPage() {
   return (
     <main className="single-page-shell page-stack">
       <PageHeader
-        eyebrow="Преддипломная практика"
-        title="Преддипломная практика. Иванов Н.Ю"
+        eyebrow="Технологическая практика"
+        title="Технологическая практика. Иванов Н.Ю"
         description="Интерактивный стенд для проверки гипотез и анализа frontend-технологий на основе экспериментальных данных."
       />
       <HypothesisAssistant />
